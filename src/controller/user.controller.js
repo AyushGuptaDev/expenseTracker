@@ -66,13 +66,21 @@ const loginUser=async (req,res)=>{
     
 
     const user=await User.findOne(
-        {$or:[{userName:userName?.toLowerCase()},{email}]}
+        {$or:[{userName:userName?.toLowerCase()},{email:email?.toLowerCase()}]}
     )
     if(!user){
         return res.status(404).json({message:"user not found"})
     }
-    const checkpassword= await user.isPasswordCorrect(password);
 
+    if(email?.trim() && email.toLowerCase()!=user.email){
+        return res.status(404).json({message:"not mactching email and username"})
+    }
+    console.log(userName)
+    if(userName?.trim() && userName.toLowerCase()!=user.userName){
+        return res.status(404).json({message:"not mactching email and username"})
+    }
+
+    const checkpassword= await user.isPasswordCorrect(password);
     if(!checkpassword){
         return res.status(401).json({message:"incorrect password"});
     }
@@ -81,7 +89,7 @@ const loginUser=async (req,res)=>{
     const refreshtoken=user.genrateRefreshToken;
     
     user.refreshToken=refreshtoken;
-    user.save();
+    await user.save();
 
     const options={
         httpOnly:true,
