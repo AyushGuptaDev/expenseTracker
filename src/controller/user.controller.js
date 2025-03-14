@@ -75,7 +75,7 @@ const loginUser=async (req,res)=>{
     if(email?.trim() && email.toLowerCase()!=user.email){
         return res.status(404).json({message:"not mactching email and username"})
     }
-    console.log(userName)
+    
     if(userName?.trim() && userName.toLowerCase()!=user.userName){
         return res.status(404).json({message:"not mactching email and username"})
     }
@@ -99,12 +99,34 @@ const loginUser=async (req,res)=>{
     delete returnAbleUser.password;
     delete returnAbleUser.refreshToken;
 
-    return res.status(200).cookie("accesstoken",Accesstoken,options)
+    return res.status(200).cookie("accessToken",Accesstoken,options)
     .cookie("refreshToken",refreshtoken,options)
     .json({message:"user loggged in successfully",user:returnAbleUser});
+}
+
+const logout=async(req,res)=>{
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                refreshToken:undefined
+            }
+        },
+        {
+            new:true
+        }
+    )
+    const options={
+        httpOnly:true,
+        secure: true
+    }
+    res.clearCookie("accessToken",options);
+    res.clearCookie("refreshToken",options);
+    return res.status(200).json({message:"user is loggedvout"})
 }
 
 
 export {registerUser,
     loginUser,
+    logout
 }
