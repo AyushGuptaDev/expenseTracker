@@ -104,6 +104,7 @@ const loginUser=async (req,res)=>{
     .json({message:"user loggged in successfully",user:returnAbleUser});
 }
 
+
 const logout=async(req,res)=>{
     await User.findByIdAndUpdate(
         req.user._id,
@@ -125,8 +126,28 @@ const logout=async(req,res)=>{
     return res.status(200).json({message:"user is loggedout"})
 }
 
+const changePassword=async (req,res)=>{
+    const {prevPassword,updatedPassword}=req.body;
+    if(! prevPassword|| !updatedPassword){
+        return res.status(400).json({message:"prevpassword and upadated password are required"})
+    }
+    
+    const user=await User.findById(req.user._id);
+
+    const checkpassword=await user.isPasswordCorrect(prevPassword);
+    
+    if(!checkpassword){
+        return res.status(401).json({message:"incorrect password "});
+    }
+
+    user.password=updatedPassword;
+    user.save();
+
+    return res.status(200).json({message:"password updated"});
+}
 
 export {registerUser,
     loginUser,
-    logout
+    logout,
+    changePassword,
 }
