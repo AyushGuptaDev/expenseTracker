@@ -8,7 +8,7 @@ const verfyjwt= async (req,res,next)=>{
         if(!token){
             return res.status(401).json({message:"unothorised request"})
         };
-        console.log(process.env.ACCESS_TOKEN_SECRET);
+        
         
         const decodedtoken=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
         const user=await User.findById(decodedtoken._id).select("-password -refreshToken");

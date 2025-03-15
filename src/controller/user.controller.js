@@ -85,8 +85,8 @@ const loginUser=async (req,res)=>{
         return res.status(401).json({message:"incorrect password"});
     }
 
-    const Accesstoken=user.genrateAcessToken;
-    const refreshtoken=user.genrateRefreshToken;
+    const Accesstoken=user.genrateAcessToken();
+    const refreshtoken=user.genrateRefreshToken();
     
     user.refreshToken=refreshtoken;
     await user.save();
@@ -122,7 +122,7 @@ const logout=async(req,res)=>{
     }
     res.clearCookie("accessToken",options);
     res.clearCookie("refreshToken",options);
-    return res.status(200).json({message:"user is loggedvout"})
+    return res.status(200).json({message:"user is loggedout"})
 }
 
 
