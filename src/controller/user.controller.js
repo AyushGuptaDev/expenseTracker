@@ -1,5 +1,5 @@
 import { User } from "../model/user.model.js";
-import {  uploadonCloudnery } from "../utils/cloudnery.js";
+import {  uploadonCloudnery , deleteonCloudnery} from "../utils/cloudnery.js";
 
 
 
@@ -126,6 +126,7 @@ const logout=async(req,res)=>{
     return res.status(200).json({message:"user is loggedout"})
 }
 
+
 const changePassword=async (req,res)=>{
     const {prevPassword,updatedPassword}=req.body;
     if(! prevPassword|| !updatedPassword){
@@ -146,8 +147,30 @@ const changePassword=async (req,res)=>{
     return res.status(200).json({message:"password updated"});
 }
 
+
+const changecoverImage=async (req,res)=>{
+
+    const user=req.user;
+    if(user.coverImage!=""){
+        await deleteonCloudnery(user.coverImage)
+    }
+    let newcoverImageUrl="";
+    const filepath=req.file?.path
+    
+    if(filepath){
+        const coverImage=await uploadonCloudnery(filepath);
+        newcoverImageUrl=coverImage.secure_url;
+    }
+
+    user.coverImage=newcoverImageUrl;
+    user.save();
+    return res.status(200).json({message:"image updated successfully"})
+}
+
+
 export {registerUser,
     loginUser,
     logout,
     changePassword,
+    changecoverImage
 }
