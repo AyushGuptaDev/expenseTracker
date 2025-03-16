@@ -10,6 +10,8 @@ router.post("/login",loginUser);
 router.post("/logout",verfyjwt,logout);
 router.post("/changePassword",verfyjwt,changePassword);
 router.post("/changeCoverImage",verfyjwt,upload.single("coverImage"),changecoverImage)
+
+//get user expense
 router.get("/showExpense",verfyjwt,showExpense);
 router.get("/getDateWiseExpense",verfyjwt,showExpenseDateWise);
 export default router;
