@@ -1,3 +1,4 @@
+import { Expense } from "../model/expense.model.js";
 import { User } from "../model/user.model.js";
 import {  uploadonCloudnery , deleteonCloudnery} from "../utils/cloudnery.js";
 
@@ -167,10 +168,32 @@ const changecoverImage=async (req,res)=>{
     return res.status(200).json({message:"image updated successfully"})
 }
 
+const showExpense=async(req,res)=>{
+    try {
+        let {limit}=req.body
+        if(!limit){
+            limit=10;
+        }
+        
+        const expenses=await Expense.find({userId:req.user._id})
+        .sort({ createdAt: -1})
+        .limit(limit)
+        
+        const totatExpense=expenses.reduce((sum,exp)=>sum+exp.amount,0);
+
+        return res.status(200).json({message:"fettched expense successfully",expenses,totalexpense:totatExpense});
+    
+    } catch (error) {
+        
+        return res.status(500).json({message:"while getting response",error:error})
+    }
+
+}
 
 export {registerUser,
     loginUser,
     logout,
     changePassword,
-    changecoverImage
+    changecoverImage,
+    showExpense
 }
