@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { upload } from "../middleware/multer.middleware.js";
-import { registerUser, loginUser,logout,changePassword,changecoverImage,showExpense} from "../controller/user.controller.js";
+import { registerUser, loginUser,logout,changePassword,changecoverImage,showExpense,showExpenseDateWise} from "../controller/user.controller.js";
 import { verfyjwt } from "../middleware/auth.middleware.js";
 const router=Router();
 
@@ -11,4 +11,5 @@ router.post("/logout",verfyjwt,logout);
 router.post("/changePassword",verfyjwt,changePassword);
 router.post("/changeCoverImage",verfyjwt,upload.single("coverImage"),changecoverImage)
 router.get("/showExpense",verfyjwt,showExpense);
+router.get("/getDateWiseExpense",verfyjwt,showExpenseDateWise);
 export default router;

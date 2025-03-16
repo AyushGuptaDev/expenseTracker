@@ -23,7 +23,40 @@ const addExpense=async(req,res)=>{
 
 }
 
+const deleteExpense = async (req, res) => {
+    try {
+        const { expenseID } = req.body;
+
+        
+        const expense = await Expense.findById(expenseID);
+        if (!expense) {
+            return res.status(404).json({ message: "Expense not found" });
+        }
+
+        
+        if (expense.userId.toString() !== req.user.id) {
+            return res.status(403).json({ message: "Unauthorized request" });
+        }
+
+        
+        await Expense.findByIdAndDelete(expenseID);
+
+        return res.status(200)
+        .json({ 
+            message: "Deleted successfully" ,
+            amount:expense.amount,
+            title:expense.title,
+            }
+        );
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
 
 export{
-    addExpense
+    addExpense,
+    deleteExpense
 }

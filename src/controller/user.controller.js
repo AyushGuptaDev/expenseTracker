@@ -170,7 +170,8 @@ const changecoverImage=async (req,res)=>{
 
 const showExpense=async(req,res)=>{
     try {
-        let {limit}=req.body
+        let {limit}=req.body;
+
         if(!limit){
             limit=10;
         }
@@ -190,10 +191,45 @@ const showExpense=async(req,res)=>{
 
 }
 
+const showExpenseDateWise = async (req, res) => {
+    try {
+        const { startDate, endDate } = req.body;
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        
+        end.setHours(23, 59, 59, 999);
+
+        
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return res.status(400).json({ message: "Invalid date format" });
+        }
+
+        const expenses = await Expense.find({
+            userId: req.user._id, 
+            createdAt: { $gte: start, $lte: end }
+        });
+
+        const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+        return res.status(200).json({
+            message: "Expenses fetched successfully",
+            expenses,
+            totalAmount
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+
+
 export {registerUser,
     loginUser,
     logout,
     changePassword,
     changecoverImage,
-    showExpense
+    showExpense,
+    showExpenseDateWise,
 }
