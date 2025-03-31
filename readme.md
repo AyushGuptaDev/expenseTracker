@@ -68,26 +68,7 @@ REFRESH_TOKEN_EXPIRY=7d
 npm run dev
 ```
 
-## 📬 API Endpoints
-### 🔹 Authentication
-- **POST** `/api/auth/signup` – Register a new user
-- **POST** `/api/auth/login` – Authenticate user and get JWT token
 
-### 🔹 Expense Management
-- **POST** `/api/expenses` – Add an expense
-- **GET** `/api/expenses` – View all expenses
-- **DELETE** `/api/expenses/:id` – Delete an expense
-- **GET** `/api/expenses/filter?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD` – Filter expenses within a date range
-- **GET** `/api/expenses/total?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD` – Get total expenses within a date range
-
-## 📌 Testing with Postman
-You can import the **Postman collection** to test the APIs. [Postman Collection Link](#) (Add the actual link)
-
-## 🎯 Future Enhancements
-- 📊 Analytics & Reporting Dashboard
-- 📅 Recurring Expenses
-- 📩 Email Notifications
-- 💳 Payment Integration
 
 ## 📌 Contributing
 Feel free to raise issues or submit pull requests to improve this project!
