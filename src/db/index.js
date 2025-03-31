@@ -4,7 +4,7 @@ const dataBaseName="expenseTracker"
 
 const connectdb=async ()=>{
     try {
-        console.log(process.env.MONGODB_URL)
+        
         const database=await mongoose.connect(`${process.env.MONGODB_URL}/${dataBaseName}`);
         console.log(`data base connected successfully : ${database.connection.host}`)
     } catch (error) {
