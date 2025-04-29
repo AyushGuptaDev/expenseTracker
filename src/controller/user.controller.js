@@ -12,11 +12,17 @@ const registerUser=async (req,res)=>{
     if ([userName,email,password].some(field=>
         field?.trim()===""))
         {
-            return res.status(400).json({message:"all fields are required"});
+            return res.status(400).json({message:"username ,email and passwors can't be empty"});
         }
-    
+
+    const usernameRegex = /^[a-zA-Z0-9_]+$/; // allows letters, numbers, and underscores only
+    if (!usernameRegex.test(userName.trim())) {
+        return res.status(400).json({ message: "Username should not contain special characters" });
+    }
+
+
     const existUser=await User.findOne(
-        {$or:[{userName:userName.toLowerCase()},{email:email.toLowerCase()}]}
+        {$or:[{userName:userName.toLowerCase().trim()},{email:email.toLowerCase().trim()}]}
     )  
     
     if(existUser){
@@ -34,8 +40,8 @@ const registerUser=async (req,res)=>{
     }
 
     const user= await User.create({
-        userName : userName.toLowerCase(),
-        email:email.toLowerCase(),
+        userName : userName.toLowerCase().trim(),
+        email:email.toLowerCase().trim(),
         password,
         coverImage:coverImageUrl
     });
@@ -73,13 +79,13 @@ const loginUser=async (req,res)=>{
         return res.status(404).json({message:"user not found"})
     }
 
-    if(email?.trim() && email.toLowerCase()!=user.email){
-        return res.status(404).json({message:"not mactching email and username"})
-    }
+    // if(email?.trim() && email.toLowerCase()!=user.email){
+    //     return res.status(404).json({message:"not mactching email and username"})
+    // }
     
-    if(userName?.trim() && userName.toLowerCase()!=user.userName){
-        return res.status(404).json({message:"not mactching email and username"})
-    }
+    // if(userName?.trim() && userName.toLowerCase()!=user.userName){
+    //     return res.status(404).json({message:"not mactching email and username"})
+    // }
 
     const checkpassword= await user.isPasswordCorrect(password);
     if(!checkpassword){
@@ -94,7 +100,7 @@ const loginUser=async (req,res)=>{
 
     const options={
         httpOnly:true,
-        secure:true
+        secure:false
     }
     const returnAbleUser=user.toObject();
     delete returnAbleUser.password;
@@ -120,7 +126,7 @@ const logout=async(req,res)=>{
     )
     const options={
         httpOnly:true,
-        secure: true
+        secure: false
     }
     res.clearCookie("accessToken",options);
     res.clearCookie("refreshToken",options);
@@ -165,24 +171,34 @@ const changecoverImage=async (req,res)=>{
 
     user.coverImage=newcoverImageUrl;
     user.save();
-    return res.status(200).json({message:"image updated successfully"})
+    return res.status(200).json({message:"image updated successfully",coverImage:newcoverImageUrl})
 }
 
 const showExpense=async(req,res)=>{
     try {
-        let {limit}=req.body;
+        let {limit=10,cursor}=req.query;
 
-        if(!limit){
-            limit=10;
+        const query={userId:req.user._id};
+
+        if(cursor){   
+            query.createdAt = { $lt: new Date(cursor) };
         }
         
-        const expenses=await Expense.find({userId:req.user._id})
-        .sort({ createdAt: -1})
-        .limit(limit)
         
-        const totatExpense=expenses.reduce((sum,exp)=>sum+exp.amount,0);
+        const expenses=await Expense.find(query)
+        .sort({ createdAt: -1})
+        .limit(parseInt(limit))
 
-        return res.status(200).json({message:"fettched expense successfully",expenses,totalexpense:totatExpense});
+        const nextCursor=expenses.length>0
+        ?expenses[expenses.length-1].createdAt
+        :null;
+        
+        
+        return res.status(200).json({message:"fettched expense successfully",
+            expenses:expenses,
+            nextCursor:nextCursor,
+            hasMore:expenses.length===limit
+        });
     
     } catch (error) {
         
@@ -193,7 +209,7 @@ const showExpense=async(req,res)=>{
 
 const showExpenseDateWise = async (req, res) => {
     try {
-        const { startDate, endDate } = req.body;
+        const { startDate, endDate } = req.query;
 
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -213,10 +229,11 @@ const showExpenseDateWise = async (req, res) => {
 
         const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
+
         return res.status(200).json({
             message: "Expenses fetched successfully",
-            expenses,
-            totalAmount
+            expenses:expenses,
+            totalAmount:totalAmount
         });
     } catch (error) {
         return res.status(500).json({ message: "Server error", error: error.message });

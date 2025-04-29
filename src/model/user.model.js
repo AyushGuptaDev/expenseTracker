@@ -45,7 +45,7 @@ userSchema.methods.genrateAcessToken= function () {
         _id:this._id,
         email:this.email,
         userName:this.userName
-    },process.env.ACCESS_TOKEN_SECRET,{expiresIn:process.env.ACCESS_TOKEN_EXPIRY})
+    },process.env.ACCESS_TOKEN_SECRET, {expiresIn:process.env.ACCESS_TOKEN_EXPIRY})
 };
 
 userSchema.methods.genrateRefreshToken= function () {

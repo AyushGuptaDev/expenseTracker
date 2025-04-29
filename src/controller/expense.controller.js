@@ -16,7 +16,7 @@ const addExpense=async(req,res)=>{
 
     const createdExpense=await Expense.findById(expense._id);
     if(!createdExpense){
-        return res.status(400).json({message:"error while crearing user"});
+        return res.status(400).json({message:"error while adding expense"});
     }
 
     return res.status(200).json({message:"expense added successfully",expense:createdExpense});
@@ -25,10 +25,11 @@ const addExpense=async(req,res)=>{
 
 const deleteExpense = async (req, res) => {
     try {
-        const { expenseID } = req.body;
+        const { expenseId } = req.body;
 
         
-        const expense = await Expense.findById(expenseID);
+        const expense = await Expense.findById(expenseId);
+
         if (!expense) {
             return res.status(404).json({ message: "Expense not found" });
         }
@@ -39,7 +40,7 @@ const deleteExpense = async (req, res) => {
         }
 
         
-        await Expense.findByIdAndDelete(expenseID);
+        await Expense.findByIdAndDelete(expenseId);//deleting expense
 
         return res.status(200)
         .json({ 
